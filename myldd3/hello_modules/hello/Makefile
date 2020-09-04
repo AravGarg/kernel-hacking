@@ -3,5 +3,7 @@ KDIR=/lib/modules/`uname -r`/build
 PWD=$(shell pwd)
 all:
 	$(MAKE) -C $(KDIR) M=$(PWD) modules
+	insmod ./*.ko
+	dmesg
 clean:
-	rm -rf *ko* *mod* *.o* *.symvers
+	$(MAKE) -C $(KDIR) M=$(PWD) clean
