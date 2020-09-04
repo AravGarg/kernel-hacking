@@ -1,0 +1,11 @@
+#!/bin/bash -eu
+
+. debian/debian.env
+
+# Remove snapdragon from d-i
+sed -i /snapdragon/d ${DEBIAN}/d-i/kernel-versions
+
+# We don't build snapdragon
+sed -i '/_snapdragon/d' ${DEBIAN}/rules.d/arm64.mk
+sed -i 's/^\(flavo.*\)\ssnapdragon\(.*\)$/\1\2/' ${DEBIAN}/rules.d/arm64.mk
+rm -f ${DEBIAN}/config/arm64/config.flavour.snapdragon

@@ -4,4 +4,4 @@ PWD=$(shell pwd)
 all:
 	$(MAKE) -C $(KDIR) M=$(PWD) modules
 clean:
-	rm -rf *.ko *.mod.* *.o* *.symvers
+	rm -rf *ko* *mod* *.o* *.symvers
