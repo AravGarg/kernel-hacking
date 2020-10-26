@@ -1,0 +1,4 @@
+display/2xg $rsp+0x8
+pie breakpoint *0x68c
+set directories /media/sf_kalishared/glibcs/glibc-2.27/stdio-common
+display/xg 0xffffffffff600000

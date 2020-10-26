@@ -1,0 +1,5 @@
+https://ctftime.org/writeup/24159
+http://davisdoesdownunder.blogspot.com/2011/02/linux-syscall-vsyscall-and-vdso-oh-my.html
+https://lwn.net/Articles/446528/
+https://blackbeard666.github.io/pwn_exhibit/content/2020_CTF/DamCTF/pwn_allokay/pwn_allokay_writeup.html
+https://nandynarwhals.org/hitbgsec2017-1000levels/
