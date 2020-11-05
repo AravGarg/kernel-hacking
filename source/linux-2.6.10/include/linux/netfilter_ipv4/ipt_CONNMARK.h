@@ -1,5 +1,5 @@
-#ifndef _IPT_CONNMARK_H_target
-#define _IPT_CONNMARK_H_target
+#ifndef _IPT_CONNMARK_H
+#define _IPT_CONNMARK_H
 
 /* Copyright (C) 2002,2004 MARA Systems AB <http://www.marasystems.com>
  * by Henrik Nordstrom <hno@marasystems.com>
@@ -10,16 +10,9 @@
  * (at your option) any later version.
  */
 
-enum {
-	IPT_CONNMARK_SET = 0,
-	IPT_CONNMARK_SAVE,
-	IPT_CONNMARK_RESTORE
+struct ipt_connmark_info {
+	unsigned long mark, mask;
+	u_int8_t invert;
 };
 
-struct ipt_connmark_target_info {
-	unsigned long mark;
-	unsigned long mask;
-	u_int8_t mode;
-};
-
-#endif /*_IPT_CONNMARK_H_target*/
+#endif /*_IPT_CONNMARK_H*/

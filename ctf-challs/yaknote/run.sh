@@ -5,7 +5,7 @@ qemu-system-x86_64 \
     -m 256 \
     -nographic \
     -kernel bzImage \
-    -initrd initrd.gz \
-    -append "quiet console=ttyS0 nokaslr" \
+    -initrd initrd \
+    -append "console=ttyS0 nokaslr" \
     -nographic \
     -monitor /dev/null \

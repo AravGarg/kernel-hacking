@@ -1,9 +1,8 @@
-#ifndef _IPT_MARK_H
-#define _IPT_MARK_H
+#ifndef _IPT_MARK_H_target
+#define _IPT_MARK_H_target
 
-struct ipt_mark_info {
-    unsigned long mark, mask;
-    u_int8_t invert;
+struct ipt_mark_target_info {
+	unsigned long mark;
 };
 
-#endif /*_IPT_MARK_H*/
+#endif /*_IPT_MARK_H_target*/

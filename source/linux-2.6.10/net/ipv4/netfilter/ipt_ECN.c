@@ -1,177 +1,130 @@
-/* iptables module for the IPv4 and TCP ECN bits, Version 1.5
+/* IP tables module for matching the value of the IPv4 and TCP ECN bits
  *
- * (C) 2002 by Harald Welte <laforge@netfilter.org>
- * 
+ * ipt_ecn.c,v 1.3 2002/05/29 15:09:00 laforge Exp
+ *
+ * (C) 2002 by Harald Welte <laforge@gnumonks.org>
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as 
+ * it under the terms of the GNU General Public License version 2 as
  * published by the Free Software Foundation.
- *
- * ipt_ECN.c,v 1.5 2002/08/18 19:36:51 laforge Exp
-*/
+ */
 
 #include <linux/module.h>
 #include <linux/skbuff.h>
-#include <linux/ip.h>
 #include <linux/tcp.h>
-#include <net/checksum.h>
 
 #include <linux/netfilter_ipv4/ip_tables.h>
-#include <linux/netfilter_ipv4/ipt_ECN.h>
+#include <linux/netfilter_ipv4/ipt_ecn.h>
 
-MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Harald Welte <laforge@netfilter.org>");
-MODULE_DESCRIPTION("iptables ECN modification module");
+MODULE_DESCRIPTION("iptables ECN matching module");
+MODULE_LICENSE("GPL");
 
-/* set ECT codepoint from IP header.
- * 	return 0 if there was an error. */
-static inline int
-set_ect_ip(struct sk_buff **pskb, const struct ipt_ECN_info *einfo)
+static inline int match_ip(const struct sk_buff *skb,
+			   const struct ipt_ecn_info *einfo)
 {
-	if (((*pskb)->nh.iph->tos & IPT_ECN_IP_MASK)
-	    != (einfo->ip_ect & IPT_ECN_IP_MASK)) {
-		u_int16_t diffs[2];
-
-		if (!skb_ip_make_writable(pskb, sizeof(struct iphdr)))
-			return 0;
-
-		diffs[0] = htons((*pskb)->nh.iph->tos) ^ 0xFFFF;
-		(*pskb)->nh.iph->tos &= ~IPT_ECN_IP_MASK;
-		(*pskb)->nh.iph->tos |= (einfo->ip_ect & IPT_ECN_IP_MASK);
-		diffs[1] = htons((*pskb)->nh.iph->tos);
-		(*pskb)->nh.iph->check
-			= csum_fold(csum_partial((char *)diffs,
-						 sizeof(diffs),
-						 (*pskb)->nh.iph->check
-						 ^0xFFFF));
-		(*pskb)->nfcache |= NFC_ALTERED;
-	} 
-	return 1;
+	return ((skb->nh.iph->tos&IPT_ECN_IP_MASK) == einfo->ip_ect);
 }
 
-/* Return 0 if there was an error. */
-static inline int
-set_ect_tcp(struct sk_buff **pskb, const struct ipt_ECN_info *einfo, int inward)
+static inline int match_tcp(const struct sk_buff *skb,
+			    const struct ipt_ecn_info *einfo,
+			    int *hotdrop)
 {
 	struct tcphdr _tcph, *th;
-	u_int16_t diffs[2];
 
-	/* Not enought header? */
-	th = skb_header_pointer(*pskb, (*pskb)->nh.iph->ihl*4,
+	/* In practice, TCP match does this, so can't fail.  But let's
+	 * be good citizens.
+	 */
+	th = skb_header_pointer(skb, skb->nh.iph->ihl * 4,
 				sizeof(_tcph), &_tcph);
-	if (th == NULL)
+	if (th == NULL) {
+		*hotdrop = 0;
 		return 0;
+	}
 
-	diffs[0] = ((u_int16_t *)th)[6];
-	if (einfo->operation & IPT_ECN_OP_SET_ECE)
-		th->ece = einfo->proto.tcp.ece;
+	if (einfo->operation & IPT_ECN_OP_MATCH_ECE) {
+		if (einfo->invert & IPT_ECN_OP_MATCH_ECE) {
+			if (th->ece == 1)
+				return 0;
+		} else {
+			if (th->ece == 0)
+				return 0;
+		}
+	}
 
-	if (einfo->operation & IPT_ECN_OP_SET_CWR)
-		th->cwr = einfo->proto.tcp.cwr;
-	diffs[1] = ((u_int16_t *)&th)[6];
+	if (einfo->operation & IPT_ECN_OP_MATCH_CWR) {
+		if (einfo->invert & IPT_ECN_OP_MATCH_CWR) {
+			if (th->cwr == 1)
+				return 0;
+		} else {
+			if (th->cwr == 0)
+				return 0;
+		}
+	}
 
-	/* Only mangle if it's changed. */
-	if (diffs[0] != diffs[1]) {
-		diffs[0] = diffs[0] ^ 0xFFFF;
-		if (!skb_ip_make_writable(pskb,
-					  (*pskb)->nh.iph->ihl*4+sizeof(_tcph)))
+	return 1;
+}
+
+static int match(const struct sk_buff *skb, const struct net_device *in,
+		 const struct net_device *out, const void *matchinfo,
+		 int offset, int *hotdrop)
+{
+	const struct ipt_ecn_info *info = matchinfo;
+
+	if (info->operation & IPT_ECN_OP_MATCH_IP)
+		if (!match_ip(skb, info))
 			return 0;
 
-		if (th != &_tcph)
-			memcpy(&_tcph, th, sizeof(_tcph));
-
-		if ((*pskb)->ip_summed != CHECKSUM_HW)
-			_tcph.check = csum_fold(csum_partial((char *)diffs,
-							     sizeof(diffs),
-							     _tcph.check^0xFFFF));
-		memcpy((*pskb)->data + (*pskb)->nh.iph->ihl*4,
-		       &_tcph, sizeof(_tcph));
-		if ((*pskb)->ip_summed == CHECKSUM_HW)
-			if (skb_checksum_help(*pskb, inward))
-				return 0;
-		(*pskb)->nfcache |= NFC_ALTERED;
+	if (info->operation & (IPT_ECN_OP_MATCH_ECE|IPT_ECN_OP_MATCH_CWR)) {
+		if (skb->nh.iph->protocol != IPPROTO_TCP)
+			return 0;
+		if (!match_tcp(skb, info, hotdrop))
+			return 0;
 	}
+
 	return 1;
 }
 
-static unsigned int
-target(struct sk_buff **pskb,
-       const struct net_device *in,
-       const struct net_device *out,
-       unsigned int hooknum,
-       const void *targinfo,
-       void *userinfo)
+static int checkentry(const char *tablename, const struct ipt_ip *ip,
+		      void *matchinfo, unsigned int matchsize,
+		      unsigned int hook_mask)
 {
-	const struct ipt_ECN_info *einfo = targinfo;
+	const struct ipt_ecn_info *info = matchinfo;
 
-	if (einfo->operation & IPT_ECN_OP_SET_IP)
-		if (!set_ect_ip(pskb, einfo))
-			return NF_DROP;
-
-	if (einfo->operation & (IPT_ECN_OP_SET_ECE | IPT_ECN_OP_SET_CWR)
-	    && (*pskb)->nh.iph->protocol == IPPROTO_TCP)
-		if (!set_ect_tcp(pskb, einfo, (out == NULL)))
-			return NF_DROP;
-
-	return IPT_CONTINUE;
-}
-
-static int
-checkentry(const char *tablename,
-	   const struct ipt_entry *e,
-           void *targinfo,
-           unsigned int targinfosize,
-           unsigned int hook_mask)
-{
-	const struct ipt_ECN_info *einfo = (struct ipt_ECN_info *)targinfo;
-
-	if (targinfosize != IPT_ALIGN(sizeof(struct ipt_ECN_info))) {
-		printk(KERN_WARNING "ECN: targinfosize %u != %Zu\n",
-		       targinfosize,
-		       IPT_ALIGN(sizeof(struct ipt_ECN_info)));
+	if (matchsize != IPT_ALIGN(sizeof(struct ipt_ecn_info)))
 		return 0;
-	}
 
-	if (strcmp(tablename, "mangle") != 0) {
-		printk(KERN_WARNING "ECN: can only be called from \"mangle\" table, not \"%s\"\n", tablename);
+	if (info->operation & IPT_ECN_OP_MATCH_MASK)
 		return 0;
-	}
 
-	if (einfo->operation & IPT_ECN_OP_MASK) {
-		printk(KERN_WARNING "ECN: unsupported ECN operation %x\n",
-			einfo->operation);
+	if (info->invert & IPT_ECN_OP_MATCH_MASK)
 		return 0;
-	}
-	if (einfo->ip_ect & ~IPT_ECN_IP_MASK) {
-		printk(KERN_WARNING "ECN: new ECT codepoint %x out of mask\n",
-			einfo->ip_ect);
-		return 0;
-	}
 
-	if ((einfo->operation & (IPT_ECN_OP_SET_ECE|IPT_ECN_OP_SET_CWR))
-	    && e->ip.proto != IPPROTO_TCP) {
-		printk(KERN_WARNING "ECN: cannot use TCP operations on a "
-		       "non-tcp rule\n");
+	if (info->operation & (IPT_ECN_OP_MATCH_ECE|IPT_ECN_OP_MATCH_CWR)
+	    && ip->proto != IPPROTO_TCP) {
+		printk(KERN_WARNING "ipt_ecn: can't match TCP bits in rule for"
+		       " non-tcp packets\n");
 		return 0;
 	}
 
 	return 1;
 }
 
-static struct ipt_target ipt_ecn_reg = {
-	.name		= "ECN",
-	.target		= target,
-	.checkentry	= checkentry,
+static struct ipt_match ecn_match = {
+	.name		= "ecn",
+	.match		= &match,
+	.checkentry	= &checkentry,
 	.me		= THIS_MODULE,
 };
 
 static int __init init(void)
 {
-	return ipt_register_target(&ipt_ecn_reg);
+	return ipt_register_match(&ecn_match);
 }
 
 static void __exit fini(void)
 {
-	ipt_unregister_target(&ipt_ecn_reg);
+	ipt_unregister_match(&ecn_match);
 }
 
 module_init(init);
