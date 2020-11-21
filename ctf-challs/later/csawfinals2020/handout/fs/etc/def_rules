@@ -1,0 +1,11 @@
+insert_after:
+  PERMIT match /sbin/getcap
+  PERMIT match /sbin/getpcaps
+  PERMIT match /bin/busybox
+  PERMIT match /usr/local/musl/lib/libc.so
+  PERMIT match /lib/libattr.so.1.1.2448
+  PERMIT match /lib/libcap.so.2.24
+  PERMIT group 500 prefdir /home/admin
+
+insert_before:
+  DENY   prefdir /tmp

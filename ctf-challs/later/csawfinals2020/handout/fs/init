@@ -1,0 +1,13 @@
+#!/bin/sh
+
+set -e
+
+mount -t proc none proc
+mount disk.img mnt/
+
+find -maxdepth 1 -mindepth 1 '!' -name disk.img '!' -name mnt \
+  '!' -name init '!' -name proc -exec cp -dr '{}' mnt/ ';'
+mkdir mnt/proc
+ln -s /bin/busybox mnt/init
+
+exec switch_root mnt/ init

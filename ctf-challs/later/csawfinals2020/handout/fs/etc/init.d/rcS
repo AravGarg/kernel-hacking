@@ -1,0 +1,85 @@
+#!/bin/sh
+ 
+# Passwords, only useful when logging in.
+# root: password123
+# user: 
+
+if [ "$1" != 'run' ]; then
+  /bin/sh "$0" run
+  echo "+++ exited with code $? +++"
+  /sbin/poweroff -f
+fi
+
+set -e
+
+mount -t proc none /proc
+mount -t devtmpfs none /dev
+mount -t sysfs none /sys
+mount -t tmpfs tmpfs /tmp
+
+mkdir /dev/pts
+mount -t devpts none /dev/pts
+
+# Set perms
+cd /home/admin
+chown notroot:admin admin
+
+chmod 2755 admin
+setcap cap_ldw_rule+p admin
+cd /
+
+# Mount the flags
+cp /dev/sr0 /tmp/stuff.img
+mount -o ro /tmp/stuff.img /flags
+rm /tmp/stuff.img
+
+# Make sure that root directory is readonly
+mount -o remount,ro /
+
+# Initialization of some stuff
+ifconfig eth0 10.0.2.15
+hostname $(cat /etc/hostname)
+
+ip route add 10.0.2.0/24 dev eth0
+ip route add default via 10.0.2.2
+sleep 1
+
+# Check debug flag
+if grep 'debug' /proc/cmdline 2> /dev/null > /dev/null; then
+  DEBUG=1
+else
+  DEBUG=0
+fi
+
+# Since this is per-user
+#chmod o-r /tmp
+
+insmod /whitelist.ko
+/ldw_util -c /etc/def_rules
+
+echo '________                __                .__               '
+echo '\______ \ _____ _______|  | ____ __  ____ |__| ____   ____  '
+echo ' |    |  \\__  \\_  __ \  |/ /  |  \/    \|  |/  _ \ /    \ '
+echo ' |    `   \/ __ \|  | \/    <|  |  /   |  \  (  <_> )   |  \'
+echo '/_______  (____  /__|  |__|_ \____/|___|  /__|\____/|___|  /'
+echo '        \/     \/           \/          \/               \/ '
+
+read -p "Give me a program to wget (yes dns is set up also): " URL
+case "$URL" in 
+  http://*)
+    if wget -O /tmp/pwnme "$URL" && chmod +x /tmp/pwnme; then
+      # Run debug shell
+      if [ $DEBUG -ne 0 ]; then
+        setsid /bin/cttyhack setuidgid 0 sh || true
+      else
+        setsid /bin/cttyhack setuidgid 1000 sh || true
+      fi
+    fi
+    ;;
+  *) 
+    echo "Bad url!"
+    ;;
+esac
+
+poweroff -d 0 -f
+

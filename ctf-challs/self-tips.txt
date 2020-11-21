@@ -1,0 +1,25 @@
+#decompress filesystem
+mkdir fs
+cd fs
+cp ../core.cpio core.cpio.gz # copy the cpio file into the folder and change the suffix
+gunzip ./core.cpio.gz 
+cpio -idm < ./core.cpio
+#compress filesystem
+find . -print0 \
+| cpio --null -ov --format=newc \
+| gzip -9 > core.cpio
+#setsid to 0 to get root->to access /sys/module/name_of_module/sections/.text for address of .text section of module and /proc/kallsyms for all symbols.
+#Use extract-vmlinux script in linux-headers to extract vmlinux from bzImage
+/usr/src/linux-headers-$(uname -r)/scripts/extract-vmlinux bzImage > vmlinux
+#cat /sys/module/name_of_module/sections/.text->address of .text sectiion of loaded module.
+#load debug info:add-symbol-file /path/to/module 0xd081d000 \  # .text
+ 		-s .data 0xd08232c0 \
+		-s .bss  0xd0823e20
+#find .text address of exploit->:readelf -WS ./exploit | grep .text | awk '{ print "0x"$5 }'
+#call commit_creds(prepare_kernel_cred(0)) to get root LPE
+#open the dev file created in /dev or /proc or /sys to interact with the kernel module.
+#use functions like read(),write(),ioctl() to interact with the device, this will trigger a call to device_read(),device_write(),etc.
+#if you obtain major number with register_chrdev(), you need to manually make the device file.
+#proc_create automatically creates the device file in /proc
+#usually, there are no libraries on the qemu system, so compile the exploit with gcc -static -o exploit exploit.c
+
