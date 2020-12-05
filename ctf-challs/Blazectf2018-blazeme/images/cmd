@@ -1,0 +1,19 @@
+target remote:1234
+add-symbol-file  blazeme.ko 0xffffffffc0000000
+add-symbol-file  exploit 0x4004d0
+b 63
+#pivot
+b *0xffffffff8109c604
+#exploit
+#b 46
+#kbuf
+#display/xg 0xffffffffc00023c0
+#stack
+#display/68xg 0xffffc90000157c40
+#*kbuf
+#display/10xg *(unsigned long *)0xffffffffc00023c0
+#b *0xffffffffc010715e
+#b *(((unsigned long)calloc)+183)
+#b core_read
+#0xffffffffa27dd6cf-0xffffffffa3000010 call rax
+#buf=0xf42b20
