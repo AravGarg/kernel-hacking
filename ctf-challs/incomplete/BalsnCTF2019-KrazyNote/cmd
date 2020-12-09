@@ -1,0 +1,11 @@
+target remote:1234
+add-symbol-file note.ko 0xffffffffc0000000
+add-symbol-file fs/exploit 0x4004d0
+b 181
+#ioctl start
+#b *0xffffffffc00000a9
+#b *0xffffffffc000006c
+#array
+display/10xg 0xffffffffc0004520
+#bufptr
+display/xg 0xffffffffc0002500
