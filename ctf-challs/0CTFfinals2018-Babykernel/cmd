@@ -1,0 +1,14 @@
+target remote:1234
+add-symbol-file baby.ko 0xffffffffc0002000
+#add-symbol-file fs/exploit 0x400550
+add-symbol-file fs/xploit 0x400550
+#add-symbol-file fs/solve 0x400550
+b 59
+b 70
+#ioctl start
+#b *0xffffffffc0002020
+#b *0xffffffffc00020a9
+#b *0xffffffffc00020eb	
+#b *0xffffffffc00021d2
+
+
