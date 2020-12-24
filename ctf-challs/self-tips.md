@@ -18,16 +18,16 @@ https://access.redhat.com/solutions/24029
 # gencpio.sh
 https://github.com/AravGarg/kernel-hacking/blob/master/ctf-challs/secconctf2020-kstack/fs/gen_cpio.sh
 
-#attach.sh
+# attach.sh
 https://github.com/AravGarg/kernel-hacking/blob/master/ctf-challs/secconctf2020-kstack/attach.sh
 
-#compile.sh
+# compile.sh
 https://github.com/AravGarg/kernel-hacking/blob/master/ctf-challs/secconctf2020-kstack/fs/compile.sh
 
-#cmd
+# cmd
 https://github.com/AravGarg/kernel-hacking/blob/master/ctf-challs/secconctf2020-kstack/cmd
 
-#include
+# include
 https://github.com/AravGarg/kernel-hacking/blob/master/ctf-challs/secconctf2020-kstack/fs/exploit.c
 
 # general tips
