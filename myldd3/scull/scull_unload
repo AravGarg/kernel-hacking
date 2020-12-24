@@ -1,6 +1,0 @@
-#!/bin/sh
-MODULE="scull"
-DEVICE="scull"
-rmmod ./${MODULE}.ko
-rm -r /dev/${DEVICE}[0-3]
-

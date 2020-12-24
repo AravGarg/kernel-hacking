@@ -1,12 +1,7 @@
 target remote:1234
-add-symbol-file chall.ko 0xffffffffa0000000
-add-symbol-file fs/exploit 0x4004d0
-dir /home/arav/Desktop/kernel-hacking/ctf-challs/SecurityFest2019-brainf64/linux-4.18.16/kernel
-#display/4xg 0xffff880000226500
-#b dev_ioctl
-#b *0xffffffffa00000b7
-#b 97
-#b 103
-#b 113
-b 119
-#b *(unsigned long)dev_ioctl+0x66
+add-symbol-file cmod.ko 0xffffffffc0000000
+add-symbol-file fs/test 0x4004d0
+b fs/test.c:26
+#b *(unsigned long)cmod_alloc+0x18
+#b slub.c:3744
+#b slub.c:2671

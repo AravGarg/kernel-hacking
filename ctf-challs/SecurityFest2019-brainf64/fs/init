@@ -14,16 +14,18 @@ mount -t sysfs none /sys
 
 /sbin/mdev -s
 
-chmod 400 /chall.ko
-insmod /chall.ko
-mknod /dev/brainfuck64 c 255 0
-chmod 666 /dev/brainfuck64
+#chmod 400 /chall.ko
+#insmod /chall.ko
+#mknod /dev/brainfuck64 c 255 0
+#chmod 666 /dev/brainfuck64
+insmod /cmod.ko
+chmod 777 /dev/cmod
 
 #chmod a+r /dev/hfs
 HOME=/home/user; export HOME
 ENV=$HOME/.profile; export ENV
 
-setsid cttyhack setuidgid 1000 /bin/sh
+setsid cttyhack setuidgid 0 /bin/sh
 
 
 

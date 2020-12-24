@@ -1,3 +1,0 @@
-https://gist.github.com/d4em0n/cd358e64ff956a772ebdb531a985ac2a
-https://github.com/BrieflyX/ctf-pwns/tree/master/kernel/kstack
-https://ptr-yudai.hatenablog.com/entry/2020/10/11/213127#pwn-227pts-lazynote-16-solves

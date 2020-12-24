@@ -9,7 +9,8 @@ qemu-system-x86_64 \
 -nographic \
 -monitor /dev/null \
 -s \
--append 'console=ttyS0 oops=panic panic=1'
+-smp cores=1,threads=1 \
+-append 'console=ttyS0 oops=panic panic=1 nokaslr'
 
 
 

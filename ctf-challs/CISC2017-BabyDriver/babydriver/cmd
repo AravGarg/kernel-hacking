@@ -1,9 +1,8 @@
 target remote:1234
 add-symbol-file babydriver.ko 0xffffffffc0000000
 add-symbol-file fs/credexploit 0x4004d0
-#b babyopen
-#b open
-b *(unsigned long)babyopen+0x1a
-b *(unsigned long)babyioctl+0x1c
-b *(unsigned long)babyrelease+0x10
+b 19
+b *0xffffffffc00000a9
+b *0xffffffffc00000ae
+b *0xffffffffc0000010
 

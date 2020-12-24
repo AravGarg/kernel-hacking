@@ -1,1 +1,1 @@
-gcc -o exploit -ggdb -static exploit.c
+gcc -o test -ggdb -static test.c

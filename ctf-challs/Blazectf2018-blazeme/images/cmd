@@ -2,12 +2,14 @@ target remote:1234
 add-symbol-file  blazeme.ko 0xffffffffc0000000
 add-symbol-file  exploit 0x4004d0
 b 63
+#cache_alloc
+b *0xffffffffc00000b5
 #pivot
-b *0xffffffff8109c604
+#b *0xffffffff8109c604
 #exploit
 #b 46
 #kbuf
-#display/xg 0xffffffffc00023c0
+display/xg 0xffffffffc00023c0
 #stack
 #display/68xg 0xffffc90000157c40
 #*kbuf

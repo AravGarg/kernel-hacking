@@ -1,6 +1,6 @@
 #!/bin/sh
 mount -o loop rootfs.ext2 /mnt/mp
-cp exploit /mnt/mp
+cp xploit /mnt/mp
 umount /mnt/mp
 
 /usr/bin/qemu-system-x86_64 \
