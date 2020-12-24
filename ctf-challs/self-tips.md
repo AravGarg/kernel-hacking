@@ -7,60 +7,44 @@ gunzip ./core.cpio.gz
 cpio -idm < ./core.cpio
 # if file system is already .gz with file type gzip
 gzip -cd ../initramfs.cpio.gz | cpio -imd --quiet
+
 #for a ext2/3/4 filesystem
 mount it on the host while qemu is off, make changes, unmount then boot qemu.
-mount -o loop,offset=offset /path/to/disk_image /mnt/mount_point
-https://access.redhat.com/solutions/24029
-#gencpio.sh
-#!/bin/sh
-gcc exploit.c -o exploit -ggdb -static 
-find . -print0 | cpio --null -ov --format=newc | gzip -9 > rootfs.cpio
-cd ../
-rm rootfs.cpio
-cp fs/rootfs.cpio .
-./boot.sh
-#attach.sh
-gdb vmlinux -x cmd
-#compile.sh
-gcc -o exploit -ggdb -static exploit.c
-#cmd
-target remote:1234
-add-symbol-file ch39.ko 0xf801c000
-add-symbol-file fs/exploit 0x4004d0
-#include
-#define _GNU_SOURCE
-#include<sched.h>
-#include<stdio.h>
-#include<stdlib.h>
-#include<unistd.h>
-#include<sys/mman.h>
-#include<string.h>
-#include<sys/stat.h>
-#include<sys/types.h>
-#include<fcntl.h>
-#include<errno.h>
-#include<sys/wait.h>
-#include<pthread.h>
-#include<sys/syscall.h>
-#include<sys/ioctl.h>
-#include<linux/userfaultfd.h>
-#include <poll.h>
-#include <signal.h>
 
-# setsid to 0 to get root->
+mount -o loop,offset=offset /path/to/disk_image /mnt/mount_point
+
+https://access.redhat.com/solutions/24029
+
+# gencpio.sh
+https://github.com/AravGarg/kernel-hacking/blob/master/ctf-challs/secconctf2020-kstack/fs/gen_cpio.sh
+
+#attach.sh
+https://github.com/AravGarg/kernel-hacking/blob/master/ctf-challs/secconctf2020-kstack/attach.sh
+
+#compile.sh
+https://github.com/AravGarg/kernel-hacking/blob/master/ctf-challs/secconctf2020-kstack/fs/compile.sh
+
+#cmd
+https://github.com/AravGarg/kernel-hacking/blob/master/ctf-challs/secconctf2020-kstack/cmd
+
+#include
+https://github.com/AravGarg/kernel-hacking/blob/master/ctf-challs/secconctf2020-kstack/fs/exploit.c
+
+# general tips
+### setsid to 0 to get root->
 to access /sys/module/name_of_module/sections/.text for address of .text section of module
 /proc/kallsyms for all symbols.
 change uid to 0 in /etc/passwd
-#use cpu kvm64 to allow smep,smap
-# Use extract-vmlinux script in linux-headers to extract vmlinux from bzImage
+## use cpu kvm64 to allow smep,smap
+## Use extract-vmlinux script in linux-headers to extract vmlinux from bzImage
 /usr/src/linux-headers-$(uname -r)/scripts/extract-vmlinux bzImage > vmlinux
-# cat /sys/module/name_of_module/sections/.text->address of .text sectiion of loaded module.
-# load debug info:add-symbol-file /path/to/module 0xd081d000 \  #  .text
+## cat /sys/module/name_of_module/sections/.text->address of .text sectiion of loaded module.
+## load debug info:add-symbol-file /path/to/module 0xd081d000 \  #  .text
  		-s .data 0xd08232c0 \
 		-s .bss  0xd0823e20
-# open the dev file created in /dev or /proc or /sys to interact with the kernel module.
-# if you obtain major number with register_chrdev(), you need to manually make the device file.
-# proc_create automatically creates the device file in /proc
+## open the dev file created in /dev or /proc or /sys to interact with the kernel module.
+## if you obtain major number with register_chrdev(), you need to manually make the device file.
+## proc_create automatically creates the device file in /proc
 char *args[]={"/bin/sh",NULL}; execve("/bin/sh",args,NULL) is needed to spqwn shell.
 To define kernel functions, first create a typedef with: ret_type(typedefname)(args) and then define with function with typedefname addr.Example:
 typedef unsigned long __attribute__((regparm(3)))(*commit_creds_func)(unsigned long cred);
