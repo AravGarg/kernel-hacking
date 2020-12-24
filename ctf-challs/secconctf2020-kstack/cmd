@@ -1,0 +1,10 @@
+target remote:1234
+add-symbol-file fs/exploit 0x400550
+add-symbol-file kstackold.ko 0xffffffffc0000000
+#b *0xffffffff814a7871
+#b exploit.c:173
+#b open
+#disable 2
+b exploit.c:178
+b exploit.c:75
+display/xg 0xffffffffc0002340

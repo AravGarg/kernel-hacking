@@ -1,0 +1,1 @@
+gdb vmlinuxold -x cmd
