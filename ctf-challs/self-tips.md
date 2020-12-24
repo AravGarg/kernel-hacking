@@ -1,9 +1,11 @@
-## general setup
-# decompress filesystem
-cp ../core.cpio core.cpio.gz #  copy the gzip file into the folder and change the suffix
+# general setup
+## decompress filesystem
+cp ../core.cpio core.cpio.gz #  copy the gzip file into the folder and change the suffix 
+
 gunzip ./core.cpio.gz 
+
 cpio -idm < ./core.cpio
-#if file system is already .gz with file type gzip
+# if file system is already .gz with file type gzip
 gzip -cd ../initramfs.cpio.gz | cpio -imd --quiet
 #for a ext2/3/4 filesystem
 mount it on the host while qemu is off, make changes, unmount then boot qemu.
