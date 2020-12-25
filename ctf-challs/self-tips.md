@@ -28,7 +28,7 @@ https://github.com/AravGarg/kernel-hacking/blob/master/ctf-challs/secconctf2020-
 https://github.com/AravGarg/kernel-hacking/blob/master/ctf-challs/secconctf2020-kstack/cmd
 
 # include
-https://github.com/AravGarg/kernel-hacking/blob/master/ctf-challs/secconctf2020-kstack/fs/exploit.c
+https://github.com/AravGarg/kernel-hacking/blob/master/ctf-challs/asisctf2020-sharedhouse/shared_distfiles/fs/exploit.c#L1
 
 # general tips
 setsid to 0 to get root->
@@ -72,6 +72,8 @@ https://github.com/AravGarg/kernel-hacking/blob/master/ctf-challs/secconctf2020-
 
 https://github.com/AravGarg/kernel-hacking/blob/master/ctf-challs/secconctf2020-kstack/fs/xploit.c#L173
 
+https://github.com/AravGarg/kernel-hacking/blob/master/ctf-challs/asisctf2020-sharedhouse/shared_distfiles/fs/exploit.c#L196
+
 ### x86
 https://github.com/AravGarg/rootme-myexploits/blob/main/LinKern_x86/basicROP/fs/exploit.c#L49
 
@@ -104,17 +106,34 @@ https://github.com/pr0cf5/CTF-writeups/blob/master/2019/BalsnCTF/knote/exploit.c
 
 # kernel ds + sprays
 https://ptr-yudai.hatenablog.com/entry/2020/03/16/165628#subprocess_info
+## any-size(msg_msg):
+https://ptr-yudai.hatenablog.com/entry/2020/07/06/000622#354pts-Shared-House-7-solves
+
+## kmalloc-32(0x20)
+https://github.com/AravGarg/kernel-hacking/blob/master/ctf-challs/secconctf2020-kstack/fs/exploit.c#L174
+
+make sure to have a valid fd in the cache
+
+## kmalloc-128(0x80)
+https://github.com/AravGarg/rootme-myexploits/blob/main/LinKern_x64/SLUB_offby1/fs/exploit.c#L86
+
 
 # Race conditions:
 ## create new thread:
         pthread_t t1;
         pthread_create(&t1,NULL,startfunc,&arg);
-# wait for thread to terminate:
+## wait for thread to terminate:
 	pthread_join(t1,NULL);
-# create new child process that behaves like a thread:
+## create new child process that behaves like a thread:
 	pid_t pid=clone(startfunc,fakestack+0xf000,CLONE_VM|CLONE_FILES|SIGCHLD,&arg);
-# wait for child process to terminate:
+## wait for child process to terminate:
 	wait(NULL);
-# check rootme reentrant-code for race conditions example
+## check rootme reentrant-code for race conditions example
 
-
+# kmalloc flags:
+## kmalloc(DMA):
+	1
+## kmalloc(KERNEL):
+	0x6000c0
+## kzalloc(KERNEL):
+	0x6080c0

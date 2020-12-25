@@ -1,0 +1,27 @@
+#! /bin/sh
+find / -exec chown root: {} \;
+find / -type d -exec chmod 0755 {} \;
+find /bin /sbin /usr -type f -exec chmod 0755 {} \;
+find /etc -type f -exec chmod 0644 {} \;
+chown -R user:user /home/user
+chown -R root:root /root/
+chmod -R 440 /root/
+chmod 700 /root
+
+mount -t devtmpfs none /dev
+mount -t proc none /proc
+mount -t sysfs none /sys
+
+/sbin/mdev -s
+
+insmod /cmod.ko
+chmod 777 /dev/cmod
+
+#chmod a+r /dev/hfs
+HOME=/home/user; export HOME
+ENV=$HOME/.profile; export ENV
+
+setsid cttyhack setuidgid 0 /bin/sh
+
+
+
