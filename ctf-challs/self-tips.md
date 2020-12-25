@@ -96,6 +96,12 @@ https://github.com/AravGarg/rootme-myexploits/blob/main/LinKern_x64/raceconditio
 ### for x86:
 https://github.com/AravGarg/rootme-myexploits/blob/main/LinKern_x86/nullptr_dereference/fs/exploit.c#L25
 
+## prepareUFD
+https://github.com/pr0cf5/CTF-writeups/blob/master/2019/BalsnCTF/knote/exploit.c#L147
+
+## handle page-fault
+https://github.com/pr0cf5/CTF-writeups/blob/master/2019/BalsnCTF/knote/exploit.c#L246
+
 # kernel ds + sprays
 
 ## kmalloc-32 spray:open("/proc/self/stat",O_RDONLY)
