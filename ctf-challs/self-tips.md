@@ -103,13 +103,7 @@ https://github.com/pr0cf5/CTF-writeups/blob/master/2019/BalsnCTF/knote/exploit.c
 https://github.com/pr0cf5/CTF-writeups/blob/master/2019/BalsnCTF/knote/exploit.c#L246
 
 # kernel ds + sprays
-
-## kmalloc-32 spray:open("/proc/self/stat",O_RDONLY)
-
-## kmalloc-1024 tty_struct open("/dev/ptmx")
-
-## kmalloc-128 cred_struct fork()
-
+https://ptr-yudai.hatenablog.com/entry/2020/03/16/165628#subprocess_info
 
 # Race conditions:
 ## create new thread:
