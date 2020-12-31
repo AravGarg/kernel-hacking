@@ -31,6 +31,9 @@ https://github.com/AravGarg/kernel-hacking/blob/master/ctf-challs/secconctf2020-
 https://github.com/AravGarg/kernel-hacking/blob/master/ctf-challs/asisctf2020-sharedhouse/shared_distfiles/fs/exploit.c#L1
 
 # general tips
+
+if kaslr is off, then gs value is fixed, leak with a kernel panic, current_task_struct is at fixed offset from gs, get this from disassembly of _do_fork function. struct cred is at a fixed offset from the struct current_task_struct, get this by `p &(((struct task_struct*)0)->cred)`. Now we have address of struct cred. Overwrite this address to get root.
+
 setsid to 0 to get root->
 
 to access /sys/module/name_of_module/sections/.text for address of .text section of module
@@ -80,6 +83,9 @@ https://github.com/AravGarg/rootme-myexploits/blob/main/LinKern_x86/basicROP/fs/
 ## leaks in kernel:
 https://github.com/AravGarg/kernel-hacking/blob/master/ctf-challs/0CTFfinals2018-Babykernel/fs/exploit.c#L44
 
+if lseek fails:
+https://github.com/AravGarg/kernel-hacking/blob/master/ctf-challs/BsidestlvCTF2020-kapara/exploit.c#L62
+
 ## set_affinity: 
 https://github.com/AravGarg/kernel-hacking/blob/master/ctf-challs/CISC2017-BabyDriver/babydriver/fs/solve.c#L107
 
@@ -87,9 +93,11 @@ https://github.com/AravGarg/kernel-hacking/blob/master/ctf-challs/CISC2017-BabyD
 https://github.com/AravGarg/rootme-myexploits/blob/main/LinKern_x64/SLUB_offby1/fs/exploit.c#L66
 
 ## overwrite current process creds with arw:
-1 https://devcraft.io/2019/01/22/1118daysober-insomnihack-teaser-2019.html
+https://devcraft.io/2019/01/22/1118daysober-insomnihack-teaser-2019.html
 
-2 root-me: SLUB off-by-one writeup
+root-me: SLUB off-by-one writeup
+
+https://github.com/AravGarg/kernel-hacking/blob/master/ctf-challs/BsidestlvCTF2020-kapara/exploit.c#L106
 
 ## nullptr deference
 ### for x64:
