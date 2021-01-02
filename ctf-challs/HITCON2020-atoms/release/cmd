@@ -1,0 +1,18 @@
+target remote:1234
+add-symbol-file fs/exploit 0x4004d0
+add-symbol-file atoms.ko 0xffffffffc0000000
+#create0x110
+b *0xffffffffc0000349
+#mmap_open
+#b *0xffffffffc0000000
+#mmap_close
+b *0xffffffffc000045a
+#mmap_kfree
+b *0xffffffffc0000492
+#mmap_fault
+#b *0xffffffffc00000f0
+b exploit.c:76
+b *0xffffffff811d5c0c
+#mmap
+b *0xffffffffc00000a0
+disable 5 6
