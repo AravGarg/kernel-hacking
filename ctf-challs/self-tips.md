@@ -31,7 +31,7 @@ https://github.com/AravGarg/kernel-hacking/blob/master/ctf-challs/secconctf2020-
 https://github.com/AravGarg/kernel-hacking/blob/master/ctf-challs/r2con2020-ctfkernel/fs/exploit.c#L1
 
 # general tips
-to find offsets with the task struct, first find comm, which is the name of the process, cred struct is just before that. To find next/prev, look for this pattern:
+to find offsets with the task struct, first find comm, which is the name of the process, cred struct is just before that. To find next/prev, look for this pattern at around 0x2c8(4.19.192):
 ```0xffff8c459e96f310:	0x0000000000000000	0x0000000000000001
 0xffff8c459e96f320:	0x0000000000000001	0x000000000000000b
 0xffff8c459e96f330:	0x00000000000623f7	0x00000001b629c075
