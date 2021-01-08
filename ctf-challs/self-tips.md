@@ -28,11 +28,18 @@ https://github.com/AravGarg/kernel-hacking/blob/master/ctf-challs/secconctf2020-
 https://github.com/AravGarg/kernel-hacking/blob/master/ctf-challs/secconctf2020-kstack/cmd
 
 # include
-https://github.com/AravGarg/kernel-hacking/blob/master/ctf-challs/asisctf2020-sharedhouse/shared_distfiles/fs/exploit.c#L1
+https://github.com/AravGarg/kernel-hacking/blob/master/ctf-challs/r2con2020-ctfkernel/fs/exploit.c#L1
 
 # general tips
+to find offsets with the task struct, first find comm, which is the name of the process, cred struct is just before that. To find next/prev, look for this pattern:
+```0xffff8c459e96f310:	0x0000000000000000	0x0000000000000001
+0xffff8c459e96f320:	0x0000000000000001	0x000000000000000b
+0xffff8c459e96f330:	0x00000000000623f7	0x00000001b629c075
+0xffff8c459e96f340:	0x0000000000000000	0xffffffffbae0fa08
+0xffff8c459e96f350:	0xffff8c459e96da48	0x000000000000008c
+```
 
-if kaslr is off, then gs value is fixed, leak with a kernel panic, current_task_struct is at fixed offset from gs, get this from disassembly of _do_fork function. struct cred is at a fixed offset from the struct current_task_struct, get this by `p &(((struct task_struct*)0)->cred)`. Now we have address of struct cred. Overwrite this address to get root.
+if kaslr is off/stack leak, then gs value is fixed, leak with a kernel panic, current_task_struct is at fixed offset from gs, get this from disassembly of _do_fork function. struct cred is at a fixed offset from the struct current_task_struct, get this by `p &(((struct task_struct*)0)->cred)`. Now we have address of struct cred. Overwrite this address to get root.
 
 setsid to 0 to get root->
 
@@ -69,6 +76,9 @@ https://github.com/AravGarg/kernel-hacking/blob/master/ctf-challs/secconctf2020-
 ## getshell
 https://github.com/AravGarg/kernel-hacking/blob/master/ctf-challs/secconctf2020-kstack/fs/exploit.c#L75
 
+## set_affinity
+https://github.com/AravGarg/kernel-hacking/blob/master/ctf-challs/CISC2017-BabyDriver/babydriver/fs/solve.c#L107 
+
 ## ropchains
 ### x64 and x86(change r to e)
 https://github.com/AravGarg/kernel-hacking/blob/master/ctf-challs/secconctf2020-kstack/fs/exploit.c#L183
@@ -93,6 +103,8 @@ https://github.com/AravGarg/kernel-hacking/blob/master/ctf-challs/CISC2017-BabyD
 https://github.com/AravGarg/rootme-myexploits/blob/main/LinKern_x64/SLUB_offby1/fs/exploit.c#L66
 
 ## overwrite current process creds with arw:
+https://github.com/AravGarg/kernel-hacking/blob/master/ctf-challs/r2con2020-ctfkernel/fs/exploit.c#L265 
+
 https://devcraft.io/2019/01/22/1118daysober-insomnihack-teaser-2019.html
 
 root-me: SLUB off-by-one writeup
@@ -116,6 +128,8 @@ https://github.com/pr0cf5/CTF-writeups/blob/master/2019/BalsnCTF/knote/exploit.c
 https://ptr-yudai.hatenablog.com/entry/2020/03/16/165628#subprocess_info
 ## any-size(msg_msg):
 https://ptr-yudai.hatenablog.com/entry/2020/07/06/000622#354pts-Shared-House-7-solves
+
+setxattr("/tmp","x",data,size,XATTR_CREATE)
 
 ## kmalloc-32(0x20)
 https://github.com/AravGarg/kernel-hacking/blob/master/ctf-challs/secconctf2020-kstack/fs/exploit.c#L174
