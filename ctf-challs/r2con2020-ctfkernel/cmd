@@ -1,0 +1,37 @@
+target remote:1234
+add-symbol-file fs/exploit 0x4004d0
+add-symbol-file fs/socks_v2.ko 0xffffffffc0000000
+
+#fill start
+#b *0xffffffffc00005d6
+
+#page-fault trigger fill
+#b *0xffffffffc0000670
+
+#edit start
+#b *0xffffffffc000029a
+
+#edit memset
+#b *0xffffffffc00003b1
+
+#info_struct alloc
+b *0xffffffffc000047d
+
+#socks_pull leaks
+b *0xffffffffc000018e
+b *0xffffffffc0000193
+#leaks start
+b *0xffffffffc000040b
+
+#b exploit.c:244
+#b exploit.c:208
+#return
+b exploit.c:264
+#pivot
+#b *0xffffffff81101bd6
+
+disable 1 2 3 4
+
+
+
+
