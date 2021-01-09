@@ -1,0 +1,4 @@
+target remote:1234
+add-symbol-file fs/exploit 0x4004d0
+add-symbol-file socks.ko 0xffffffffa0000000
+b *0xffffffffa000044f
