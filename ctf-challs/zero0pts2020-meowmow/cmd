@@ -1,0 +1,18 @@
+target remote:1234
+add-symbol-file fs/exploit 0x4004d0
+add-symbol-file memo.ko 0xffffffffc0000000
+#alloc
+#b *0xffffffffc00000f3
+#freelist
+#b *0xffffffff8119765b
+#b exploit.c:51
+#leaks
+#b *0xffffffffc0000140
+#write
+#b *0xffffffffc000003a
+#b exploit.c:78
+#b *0xffffffff81c0300c
+b *0xffffffff8140ee50
+b exploit.c:118
+disable 1
+
